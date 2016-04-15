@@ -124,24 +124,18 @@ class ModifyLimitQueryTest extends \Doctrine\Tests\DbalFunctionalTestCase
         $this->assertLimitResult(array(2, 1), $sql, 2, 2);
     }
 
-    public function testModifyLimitQueryLineBreaks()
+    public function testModifyLimitQueryFromSubSelect()
     {
         $this->_conn->insert('modify_limit_table', array('test_int' => 1));
         $this->_conn->insert('modify_limit_table', array('test_int' => 2));
         $this->_conn->insert('modify_limit_table', array('test_int' => 3));
+        $this->_conn->insert('modify_limit_table', array('test_int' => 4));
 
-        $sql = <<<SQL
-SELECT
-*
-FROM
-modify_limit_table
-ORDER
-BY
-test_int
-ASC
-SQL;
+        $sql = "SELECT * FROM (SELECT * FROM modify_limit_table) sub";
 
-        $this->assertLimitResult(array(2), $sql, 1, 1);
+        $this->assertLimitResult(array(4, 3, 2, 1), $sql, 10, 0, false);
+        $this->assertLimitResult(array(4, 3), $sql, 2, 0, false);
+        $this->assertLimitResult(array(2, 1), $sql, 2, 2, false);
     }
 
     public function assertLimitResult($expectedResults, $sql, $limit, $offset, $deterministic = true)
