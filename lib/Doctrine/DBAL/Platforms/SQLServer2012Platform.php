@@ -122,7 +122,7 @@ class SQLServer2012Platform extends SQLServer2008Platform
         if ($matchesCount > 0) {
             $orderByPos = $matches[0][($matchesCount - 1)][1];
         }
-        
+
         if ($orderByPos === false
             || substr_count($query, "(", $orderByPos) - substr_count($query, ")", $orderByPos)
         ) {
